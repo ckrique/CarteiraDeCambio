@@ -27,7 +27,8 @@ namespace CarteiraDeCambio.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(AtivoCambial), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<AtivoCambial>> ReceberCompraDeMoeda([FromBody] string siglaMoeda, decimal valor)
+        [Route("ReceberCompraDeMoeda")]
+        public ActionResult<AtivoCambial> ReceberCompraDeMoeda([FromBody] string siglaMoeda, decimal valor)
         {
             if (string.IsNullOrEmpty(siglaMoeda) || valor == 0)
                 return BadRequest("Invalid product");
@@ -41,7 +42,8 @@ namespace CarteiraDeCambio.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(AtivoCambial), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<AtivoCambial>> RealizarVendaDeMoeda([FromBody] string siglaMoeda, decimal valor)
+        [Route("RealizarVendaDeMoeda")]
+        public ActionResult<AtivoCambial> RealizarVendaDeMoeda([FromBody] string siglaMoeda, decimal valor)
         {
             if (string.IsNullOrEmpty(siglaMoeda) || valor == 0)
                 return BadRequest("Invalid product");
