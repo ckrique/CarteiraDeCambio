@@ -7,7 +7,8 @@ namespace CarteiraDeCambio.Repositories
 {
     public interface ISaldoRepository
     {
-        Task<IEnumerable<Saldo>> GetTestObjects();
+        Task<IEnumerable<Saldo>> GetSaldos();
+        Task<Saldo> GetSaldoByIdMoeda(string Id);
         Task CreateSaldo(Saldo saldo);
         Task<bool> UpdateSaldo(Saldo saldo);
 

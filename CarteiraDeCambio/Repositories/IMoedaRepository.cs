@@ -8,6 +8,7 @@ namespace CarteiraDeCambio.Repositories
     public interface IMoedaRepository
     {
         Task<IEnumerable<Moeda>> GetMoedas();
+        Task<Moeda> GetMoedaBySigla(string sigla);
         Task CreateMoeda(Moeda moeda);
         Task<bool> UpdateMoeda(Moeda moeda);
 

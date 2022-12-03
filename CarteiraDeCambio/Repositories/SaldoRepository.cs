@@ -21,11 +21,16 @@ namespace CarteiraDeCambio.Repositories
             await _context.Saldos.InsertOneAsync(msaldo);
         }
 
-        public async Task<IEnumerable<Saldo>> GetTestObjects()
+        public async Task<IEnumerable<Saldo>> GetSaldos()
         {
             return await _context.Saldos.Find(p => true).ToListAsync();
         }
 
+        public async Task<Saldo> GetSaldoByIdMoeda(string IdMoeda)
+        {
+            return await _context.Saldos.Find(p => p.idMoeda == IdMoeda).FirstOrDefaultAsync();
+        }
+        
         public async Task<bool> UpdateSaldo(Saldo msaldo)
         {
             var updateResult = await _context.Saldos.ReplaceOneAsync(

@@ -26,6 +26,11 @@ namespace CarteiraDeCambio.Repositories
             return await _context.Moedas.Find(p => true).ToListAsync();
         }
 
+        public async Task<Moeda> GetMoedaBySigla(string sigla)
+        {
+            return await _context.Moedas.Find(p => p.sigla == sigla).FirstOrDefaultAsync();
+        }
+
         public async Task<bool> UpdateMoeda(Moeda moeda)
         {
             var updateResult = await _context.Moedas.ReplaceOneAsync(
