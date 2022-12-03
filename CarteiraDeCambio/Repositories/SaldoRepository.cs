@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using static CarteiraDeCambio.Data.SaldoContext;
 
-namespace TesteApiDocker2.Repositories
+namespace CarteiraDeCambio.Repositories
 {
     public class SaldoRepository : ISaldoRepository
     {

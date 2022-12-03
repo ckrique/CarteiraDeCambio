@@ -1,5 +1,5 @@
-using TesteApiDocker2.Data;
-using TesteApiDocker2.Repositories;
+using CarteiraDeCambio.Data;
+using CarteiraDeCambio.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TesteApiDocker2
+namespace CarteiraDeCambio
 {
     public class Startup
     {
@@ -27,13 +27,19 @@ namespace TesteApiDocker2
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<IContext, AtivoCambialContext>();
+            services.AddScoped<IAtivoCambialContext, AtivoCambialContext>();
             services.AddScoped<IAtivoCambialRepository, AtivoCambialRepository>();
+
+            services.AddScoped<IMoedaContext, MoedaContext>();
+            services.AddScoped<IMoedaRepository, MoedaRepository>();
+
+            services.AddScoped<ISaldoContext, SaldoContext>();
+            services.AddScoped<ISaldoRepository, SaldoRepository>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "TesteApiDocker2", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "CarteiraDeCambio", Version = "v1" });
             });
         }
 
@@ -44,7 +50,7 @@ namespace TesteApiDocker2
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TesteApiDocker2 v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CarteiraDeCambio v1"));
             }
 
             app.UseRouting();

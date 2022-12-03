@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using static CarteiraDeCambio.Data.MoedaContext;
 
-namespace TesteApiDocker2.Repositories
+namespace CarteiraDeCambio.Repositories
 {
     public class MoedaRepository : IMoedaRepository
     {
