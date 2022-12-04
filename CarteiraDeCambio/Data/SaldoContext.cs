@@ -19,7 +19,7 @@ namespace CarteiraDeCambio.Data
                ("DatabaseSettings:DatabaseName"));
 
             Saldos = database.GetCollection<Saldo>(configuration.GetValue<string>
-              ("DatabaseSettings:MoedasCollectionName"));
+              ("DatabaseSettings:SaldosCollectionName"));
         }
         
     }

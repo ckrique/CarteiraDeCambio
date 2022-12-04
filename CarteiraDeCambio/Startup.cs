@@ -1,5 +1,7 @@
+using CarteiraDeCambio.Business;
 using CarteiraDeCambio.Data;
 using CarteiraDeCambio.Repositories;
+using CarteiraDeCambio.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +37,8 @@ namespace CarteiraDeCambio
 
             services.AddScoped<ISaldoContext, SaldoContext>();
             services.AddScoped<ISaldoRepository, SaldoRepository>();
+
+            services.AddScoped<ICarteiraDeCambioService, CarteiraDeCambioService>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

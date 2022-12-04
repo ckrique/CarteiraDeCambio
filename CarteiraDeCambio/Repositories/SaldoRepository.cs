@@ -16,9 +16,14 @@ namespace CarteiraDeCambio.Repositories
             _context = context;
         }
 
-        public async Task CreateSaldo(Saldo msaldo)
+        public async Task CreateSaldo(Saldo saldo)
         {
-            await _context.Saldos.InsertOneAsync(msaldo);
+            await _context.Saldos.InsertOneAsync(saldo);
+        }
+        
+        public void CreateSaldoSync(Saldo saldo)
+        {
+            _context.Saldos.InsertOneAsync(saldo);
         }
 
         public async Task<IEnumerable<Saldo>> GetSaldos()
@@ -26,11 +31,21 @@ namespace CarteiraDeCambio.Repositories
             return await _context.Saldos.Find(p => true).ToListAsync();
         }
 
+        public IEnumerable<Saldo> GetSaldosSync()
+        {
+            return _context.Saldos.Find(p => true).ToList() as IEnumerable<Saldo>;
+        }
+        
         public async Task<Saldo> GetSaldoByIdMoeda(string IdMoeda)
         {
             return await _context.Saldos.Find(p => p.idMoeda == IdMoeda).FirstOrDefaultAsync();
         }
-        
+
+        public Saldo GetSaldoByIdMoedaSync(string IdMoeda)
+        {
+            return _context.Saldos.Find(p => p.idMoeda == IdMoeda).FirstOrDefault();
+        }
+
         public async Task<bool> UpdateSaldo(Saldo msaldo)
         {
             var updateResult = await _context.Saldos.ReplaceOneAsync(

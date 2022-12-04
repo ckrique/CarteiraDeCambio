@@ -21,9 +21,24 @@ namespace CarteiraDeCambio.Repositories
             await _context.Moedas.InsertOneAsync(moeda);
         }
 
+        public void CreateMoedaSync(Moeda moeda)
+        {
+            _context.Moedas.InsertOne(moeda);
+        }
+
         public async Task<IEnumerable<Moeda>> GetMoedas()
         {
             return await _context.Moedas.Find(p => true).ToListAsync();
+        }
+
+        public Moeda GetMoedaBySiglaSync(string sigla)
+        {
+            return _context.Moedas.Find(p => p.sigla == sigla).FirstOrDefault();
+        }
+
+        public IEnumerable<Moeda> GetMoedasSync()
+        {
+            return _context.Moedas.Find(p => true).ToList() ;
         }
 
         public async Task<Moeda> GetMoedaBySigla(string sigla)

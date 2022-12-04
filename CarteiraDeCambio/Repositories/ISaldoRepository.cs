@@ -7,10 +7,13 @@ namespace CarteiraDeCambio.Repositories
 {
     public interface ISaldoRepository
     {
-        Task<IEnumerable<Saldo>> GetSaldos();
-        Task<Saldo> GetSaldoByIdMoeda(string Id);
-        Task CreateSaldo(Saldo saldo);
-        Task<bool> UpdateSaldo(Saldo saldo);
+        public Task<IEnumerable<Saldo>> GetSaldos();
+        public IEnumerable<Saldo> GetSaldosSync();
+        public Task<Saldo> GetSaldoByIdMoeda(string Id);
+        public Saldo GetSaldoByIdMoedaSync(string Id);
+        public Task CreateSaldo(Saldo saldo);
+        public void CreateSaldoSync(Saldo saldo);
+        public Task<bool> UpdateSaldo(Saldo saldo);
 
         //Task<TestObject> GetTestObject(string id);
         //Task<IEnumerable<TestObject>> GetTestObjectByName(string name);        

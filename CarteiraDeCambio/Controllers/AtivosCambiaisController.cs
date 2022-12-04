@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using CarteiraDeCambio.Repositories;
 using CarteiraDeCambio.Business;
+using CarteiraDeCambio.Service;
 
 namespace CarteiraDeCambio.Controllers
 {
@@ -14,73 +15,117 @@ namespace CarteiraDeCambio.Controllers
         private readonly IAtivoCambialRepository _ativoCambialRepository;
         private readonly IMoedaRepository _moedaRepository;
         private readonly ISaldoRepository _saldoRepository;
-        private CarteiraDeCambioService _carteiraDeCambioService;
+        private readonly ICarteiraDeCambioService _carteiraDeCambioService;
 
         public AtivosCambiaisController(IAtivoCambialRepository ativoCambialRepository, 
                                         IMoedaRepository moedaRepository, 
                                         ISaldoRepository saldoRepository,
-                                        CarteiraDeCambioService carteiraDeCambioBusiness) 
+                                        ICarteiraDeCambioService carteiraDeCambioService) 
         {
             _ativoCambialRepository = ativoCambialRepository;
             _moedaRepository = moedaRepository;
             _saldoRepository = saldoRepository;
-            _carteiraDeCambioService = carteiraDeCambioBusiness;
-
-            _carteiraDeCambioService.InicializaMoedasNoBancoAsync();
-            _carteiraDeCambioService.InicializaSaldosDeCarteirasNoBancoAsync();
+            _carteiraDeCambioService = carteiraDeCambioService;            
         }
 
 
         [HttpPost]
-        [ProducesResponseType(typeof(AtivoCambial), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(AtivoCambial), StatusCodes.Status200OK)]        
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Route("ReceberCompraDeMoeda")]
-        public ActionResult<AtivoCambial> ReceberCompraDeMoeda([FromBody] string siglaMoeda, decimal valor)
+        //public ActionResult<AtivoCambial> ReceberCompraDeMoeda([FromBody] string siglaMoeda, decimal valorDoAtivoRecebido)
+        public ActionResult ReceberCompraDeMoeda([FromBody] AtivoCambialDTO ativoCambialDTO)
         {
-            if (string.IsNullOrEmpty(siglaMoeda) || valor == 0)
-                return BadRequest("Invalid product");
+            if (string.IsNullOrEmpty(ativoCambialDTO.siglaMoeda) || ativoCambialDTO.valor <= 0)
+                return BadRequest("Operação Incorreta, verifique os valores enviados");
 
-            _carteiraDeCambioService.ReceberCompraDeMoedaAsync(siglaMoeda, valor);
+            //TODO: validar sigla da moeda            
+            
+            Moeda moedaDaDoAtivo = _moedaRepository.GetMoedaBySiglaSync(ativoCambialDTO.siglaMoeda);
+
+            AtivoCambial ativoCamvial = new AtivoCambial();
+
+            ativoCamvial.idMoeda = moedaDaDoAtivo.Id;
+
+            ativoCamvial.valor = ativoCambialDTO.valor;
+
+            ativoCamvial.dataCriacao = DateTime.Now;
+
+            _ativoCambialRepository.CreateAtivoCambial(ativoCamvial);
+
+            Saldo saldo = _saldoRepository.GetSaldoByIdMoedaSync(moedaDaDoAtivo.Id);
+
+            saldo.valor = saldo.valor + ativoCambialDTO.valor;
+
+            _saldoRepository.UpdateSaldo(saldo);
 
             return Ok();
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(AtivoCambial), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(AtivoCambial), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Route("RealizarVendaDeMoeda")]
-        public ActionResult<AtivoCambial> RealizarVendaDeMoeda([FromBody] string siglaMoeda, decimal valor)
+        public ActionResult<AtivoCambial> RealizarVendaDeMoeda([FromBody] AtivoCambialDTO ativoCambialDTO)
         {
-            if (string.IsNullOrEmpty(siglaMoeda) || valor == 0)
-                return BadRequest("Invalid product");
+            if (string.IsNullOrEmpty(ativoCambialDTO.siglaMoeda) || ativoCambialDTO.valor <= 0)
+                return BadRequest("Operação Incorreta, verifique os valores enviados.");
 
-            //await _testObjectRepository.CreateTestObject(testObject);
+            //TODO: validar sigla da moeda            
 
-            //return CreatedAtRoute("GetTestObject", new { id = testObject.Id }, testObject);
+            Moeda moedaDaDoAtivo = _moedaRepository.GetMoedaBySiglaSync(ativoCambialDTO.siglaMoeda);
+
+            AtivoCambial ativoCamvial = new AtivoCambial();
+
+            ativoCamvial.idMoeda = moedaDaDoAtivo.Id;
+
+            ativoCamvial.valor = ativoCambialDTO.valor;
+
+            ativoCamvial.dataCriacao = DateTime.Now;
+
+            _ativoCambialRepository.CreateAtivoCambial(ativoCamvial);
+
+            Saldo saldo = _saldoRepository.GetSaldoByIdMoedaSync(moedaDaDoAtivo.Id);
+
+
+            if(saldo.valor < ativoCambialDTO.valor)
+                return BadRequest(string.Format("Não há saldo suficiente na carteira de {0} para realizar esta venda.", moedaDaDoAtivo.nome));
+
+            saldo.valor = saldo.valor - ativoCambialDTO.valor;
+
+            _saldoRepository.UpdateSaldo(saldo);
+
             return Ok();
         }
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<SaldoDTO>), StatusCodes.Status200OK)]
+        [Route("ListarSaldos")]
+        //public async Task<ActionResult<IEnumerable<SaldoDTO>>> ListarSaldos()
+        //public async Task<ActionResult<IEnumerable<Saldo>>> ListarSaldos()
         public async Task<ActionResult<IEnumerable<SaldoDTO>>> ListarSaldos()
         {
             List<SaldoDTO> listaDeSaldosDTO = new List<SaldoDTO>();
             IEnumerable<Moeda> listaMoedas = await _moedaRepository.GetMoedas();
 
 
-            List<Saldo> saldos = (List<Saldo>)await _saldoRepository.GetSaldos();
+            //List<Saldo> listaSaldos = (List<Saldo>)await _saldoRepository.GetSaldos();
 
-            foreach (Saldo saldo in saldos) 
+            List<Saldo> listaSaldos = (List<Saldo>) _saldoRepository.GetSaldosSync();
+
+            foreach (Saldo saldo in listaSaldos)
             {
-                SaldoDTO saldoDTO= new SaldoDTO();
+                SaldoDTO saldoDTO = new SaldoDTO();
                 saldoDTO.valor = saldo.valor.ToString();
-                saldoDTO.siglaMoeda = listaMoedas.Where(m => m.Id == saldo.Id).FirstOrDefault().sigla;
-                saldoDTO.NomeMoeda = listaMoedas.Where(m => m.Id == saldo.Id).FirstOrDefault().nome;
+                saldoDTO.siglaMoeda = listaMoedas.Where(m => m.Id.Equals(saldo.idMoeda)).FirstOrDefault().sigla;
+                saldoDTO.NomeMoeda = listaMoedas.Where(m => m.Id.Equals(saldo.idMoeda)).FirstOrDefault().nome;
 
                 listaDeSaldosDTO.Add(saldoDTO);
             }
 
             return Ok(listaDeSaldosDTO);
+
+            //return listaSaldos;
         }
 
     }
