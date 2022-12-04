@@ -75,21 +75,18 @@ namespace CarteiraDeCambio.Controllers
 
             Moeda moedaDaDoAtivo = _moedaRepository.GetMoedaBySiglaSync(ativoCambialDTO.siglaMoeda);
 
+            Saldo saldo = _saldoRepository.GetSaldoByIdMoedaSync(moedaDaDoAtivo.Id);
+
+            if (saldo.valor < ativoCambialDTO.valor)
+                return BadRequest(string.Format("Não há saldo suficiente na carteira de {0} para realizar esta venda.", moedaDaDoAtivo.nome));
+
             AtivoCambial ativoCamvial = new AtivoCambial();
 
             ativoCamvial.idMoeda = moedaDaDoAtivo.Id;
-
             ativoCamvial.valor = ativoCambialDTO.valor;
-
             ativoCamvial.dataCriacao = DateTime.Now;
 
-            _ativoCambialRepository.CreateAtivoCambial(ativoCamvial);
-
-            Saldo saldo = _saldoRepository.GetSaldoByIdMoedaSync(moedaDaDoAtivo.Id);
-
-
-            if(saldo.valor < ativoCambialDTO.valor)
-                return BadRequest(string.Format("Não há saldo suficiente na carteira de {0} para realizar esta venda.", moedaDaDoAtivo.nome));
+            _ativoCambialRepository.CreateAtivoCambial(ativoCamvial);            
 
             saldo.valor = saldo.valor - ativoCambialDTO.valor;
 

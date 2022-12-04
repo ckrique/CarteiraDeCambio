@@ -31,31 +31,6 @@ namespace CarteiraDeCambio.Business
             InicializaBanco();
         }
 
-
-        public async Task ReceberCompraDeMoedaAsync(string sigla, decimal valorDoAtivo) 
-        {
-            AtivoCambial ativoCambial = new AtivoCambial();
-            Saldo saldo = new Saldo();
-
-            Moeda moeda = await _moedaRepository.GetMoedaBySigla(sigla);
-
-            if (moeda is null)
-                throw new Exception("Erro ao tentar receber a compra do Ativo Cambial na Carteira");
-
-            ativoCambial.idMoeda = moeda.Id;
-
-            ativoCambial.dataCriacao = DateTime.Now;
-            _ativoCambialRepository.CreateAtivoCambial(ativoCambial);
-
-            saldo = await _saldoRepository.GetSaldoByIdMoeda(moeda.Id);
-
-            saldo.valor = saldo.valor + valorDoAtivo;
-
-            _saldoRepository.UpdateSaldo(saldo);
-
-            //TODO: REALIZAR INSERT DA MOEDA NO BANCO DE DADOS
-        }
-
         public void InicializaMoedasNoBanco() 
         {
             IEnumerable<Moeda> listaMoedas = _moedaRepository.GetMoedasSync();
