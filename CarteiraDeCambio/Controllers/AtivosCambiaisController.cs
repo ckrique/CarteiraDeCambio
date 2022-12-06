@@ -30,10 +30,8 @@ namespace CarteiraDeCambio.Controllers
 
 
         [HttpPost]
-        //[ProducesResponseType(typeof(AtivoCambial), StatusCodes.Status200OK)]        
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [Route("ReceberCompraDeMoeda")]
-        //public ActionResult<AtivoCambial> ReceberCompraDeMoeda([FromBody] string siglaMoeda, decimal valorDoAtivoRecebido)
+        [Route("ReceberCompraDeMoeda")]        
         public ActionResult ReceberCompraDeMoeda([FromBody] AtivoCambialDTO ativoCambialDTO)
         {
             if (string.IsNullOrEmpty(ativoCambialDTO.siglaMoeda) || ativoCambialDTO.valor <= 0)
@@ -63,7 +61,6 @@ namespace CarteiraDeCambio.Controllers
         }
 
         [HttpPost]
-        //[ProducesResponseType(typeof(AtivoCambial), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Route("RealizarVendaDeMoeda")]
         public ActionResult<AtivoCambial> RealizarVendaDeMoeda([FromBody] AtivoCambialDTO ativoCambialDTO)

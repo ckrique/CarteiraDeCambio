@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  carteiradecambiodb:
+    image: mongo
+
+  carteiradecambio:
+    image: ${DOCKER_REGISTRY-}carteiradecambio
+    build:
+      context: .
+      dockerfile: CarteiraDeCambio/Dockerfile
+
+volumes:
+  mongo_data:
